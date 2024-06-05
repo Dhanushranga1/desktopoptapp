@@ -144,7 +144,7 @@ def main(defects, length, width, threshold_ppms, num_sections):
         new_ppms = calculate_ppms(new_defects, new_length, width)
         
         print(f"New PPMS after removing sections {sections}: {new_ppms}")
-        print(f"Total Length of cut parts: {total_cut_length} meters")
+        print(f"Total Length of cut parts: {total_cut_length+1} meters")
         print(f"Remaining Length: {new_length} meters")
         
         plot_ppms(original_ppms, new_ppms, length, new_length, total_cut_length)
@@ -152,35 +152,37 @@ def main(defects, length, width, threshold_ppms, num_sections):
     else:
         print("PPMS is within acceptable limits. No need to cut the fabric.")
 
+# defects = [
+#     {"from": 2, "to": 2, "points": 4},
+#     {"from": 5, "to": 5, "points": 4},
+#     {"from": 10, "to": 10, "points": 1},
+#     {"from": 14, "to": 14, "points": 4},
+#     {"from": 16, "to": 16, "points": 4},
+#     {"from": 37, "to": 37, "points": 1},
+#     {"from": 41, "to": 41, "points": 4},
+#     {"from": 47, "to": 47, "points": 4},
+#     {"from": 59, "to": 59, "points": 1},
+#     {"from": 65, "to": 65, "points": 4}
+# ]
+
 defects = [
-    {"from": 2, "to": 2, "points": 4},
-    {"from": 5, "to": 5, "points": 4},
+    {"from": 2, "to": 5, "points": 12},
+    # {"from": 5, "to": 5, "points": 4},
     {"from": 10, "to": 10, "points": 1},
-    {"from": 14, "to": 14, "points": 4},
-    {"from": 16, "to": 16, "points": 4},
-    {"from": 37, "to": 37, "points": 1},
-    {"from": 41, "to": 41, "points": 4},
-    {"from": 47, "to": 47, "points": 4},
-    {"from": 59, "to": 59, "points": 1},
-    {"from": 65, "to": 65, "points": 4}
+    {"from": 22, "to": 22, "points": 4},
+    {"from": 23, "to": 28, "points": 20},
+    {"from": 35, "to": 35, "points": 2},
+    {"from": 39, "to": 39, "points": 4},
+    {"from": 46, "to": 46, "points": 2},
+    {"from": 70, "to": 70, "points": 2}
 ]
 
-# defects = [
-#     {"from": 2, "to": 5, "points": 4},
-#     # {"from": 5, "to": 5, "points": 4},
-#     {"from": 10, "to": 10, "points": 1},
-#     {"from": 22, "to": 22, "points": 4},
-#     {"from": 23, "to": 28, "points": 10},
-#     {"from": 35, "to": 35, "points": 2},
-#     {"from": 39, "to": 39, "points": 4},
-#     {"from": 46, "to": 46, "points": 2},
-#     {"from": 70, "to": 70, "points": 2}
-# ]
+
 
 length = 69.6  # Example length in meters
 width = 1.5     # Example width in meters
 THRESHOLD_PPMS = 23  # Threshold PPMS
-NUM_SECTIONS = 3 # Number of sections to remove
+NUM_SECTIONS = 2 # Number of sections to remove
 
 main(defects, length, width, THRESHOLD_PPMS, NUM_SECTIONS)
 
