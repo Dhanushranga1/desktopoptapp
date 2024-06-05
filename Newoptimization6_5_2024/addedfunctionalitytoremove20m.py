@@ -165,8 +165,8 @@ def main(defects, length, width, threshold_ppms, num_sections):
 # ]
 
 defects = [
-    {"from": 2, "to": 2, "points": 4},
-    {"from": 5, "to": 5, "points": 4},
+    {"from": 2, "to": 5, "points": 4},
+    # {"from": 5, "to": 5, "points": 4},
     {"from": 10, "to": 10, "points": 1},
     {"from": 22, "to": 22, "points": 4},
     {"from": 23, "to": 28, "points": 10},
