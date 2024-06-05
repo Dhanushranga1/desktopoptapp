@@ -95,7 +95,7 @@ def plot_fabric_sections(original_length, remaining_length, removed_sections, wi
     y_offset = 0
     for start, end in removed_sections:
         ax.add_patch(patches.Rectangle((start, y_offset), end - start + 1, width, edgecolor='black', facecolor='red', label='Removed Section'))
-        ax.text((start + end) / 2, y_offset + 0.5, f'Removed: {start}-{end}\n{end - start } meters', horizontalalignment='center', verticalalignment='center', fontsize=12, color='black')
+        ax.text((start + end) / 2, y_offset + 0.5, f'Removed: {start}-{end}\n{end - start+1 } meters', horizontalalignment='center', verticalalignment='center', fontsize=12, color='black')
         y_offset -= 1
     
     ax.set_xlim(0, original_length)
@@ -179,7 +179,7 @@ defects = [
 length = 76.1  # Example length in meters
 width = 1.5     # Example width in meters
 THRESHOLD_PPMS = 23  # Threshold PPMS
-NUM_SECTIONS = 2  # Number of sections to remove
+NUM_SECTIONS = 1  # Number of sections to remove
 
 main(defects, length, width, THRESHOLD_PPMS, NUM_SECTIONS)
 
