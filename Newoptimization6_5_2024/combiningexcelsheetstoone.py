@@ -1,7 +1,8 @@
+import os
 import pandas as pd
 import openpyxl
 print("Copying sheets from multiple files to one file")
-cwd = os.path.abspath('') 
+cwd = os.path.abspath('C:\\Myfiles')
 files = os.listdir(cwd)  
 
 df_total = pd.DataFrame()
