@@ -16,11 +16,12 @@ def calculate_section_ppms(defects, start, end, width):
     return section_ppms
 
 # Function to find multiple high-density sections and combine them
+# Function to find multiple high-density sections and combine them
 def find_combined_highest_density_sections(defects, width, num_sections):
     sections = []
     remaining_defects = defects[:]
     
-    for _ in range(num_sections):
+    while len(sections) < num_sections:
         max_density = 0
         best_section = (0, 0)
         
@@ -37,13 +38,22 @@ def find_combined_highest_density_sections(defects, width, num_sections):
             sections.append(best_section)
             # Remove the found section from the list of defects
             remaining_defects = [d for d in remaining_defects if d['from'] > best_section[1] or d['to'] < best_section[0]]
+        else:
+            break
     
+    combined_sections = []
     if sections:
         combined_start = min(start for start, end in sections)
         combined_end = max(end for start, end in sections)
-        return [(combined_start, combined_end)]
-    else:
-        return []
+        combined_sections.append((combined_start, combined_end))
+        
+        # If there are remaining sections, keep them as well
+        if remaining_defects:
+            for defect in remaining_defects:
+                combined_sections.append((defect['from'], defect['to']))
+    
+    return combined_sections
+
 
 # Function to remove combined sections from the fabric
 def remove_sections(defects, length, width, sections):
@@ -61,12 +71,12 @@ def remove_sections(defects, length, width, sections):
     # Check if the remaining parts are less than 20 meters
     remaining_starts = [0] + [end + 1 for start, end in sections]
     remaining_ends = [start - 1 for start, end in sections] + [length - 1]
-    remaining_sections = [(start, end) for start, end in zip(remaining_starts, remaining_ends) if end - start + 1 >= 5]
+    remaining_sections = [(start, end) for start, end in zip(remaining_starts, remaining_ends) if end - start + 1 >= 10]
 
     if remaining_sections:
         new_defects = [d for d in new_defects if any(start <= d['from'] <= end for start, end in remaining_sections)]
         new_length = sum(end - start + 1 for start, end in remaining_sections)
-        removed_sections.extend([(start, end) for start, end in zip(remaining_starts, remaining_ends) if end - start + 1 < 5])
+        removed_sections.extend([(start, end) for start, end in zip(remaining_starts, remaining_ends) if end - start + 1 < 10])
     
     return new_defects, new_length, total_cut_length, removed_sections
 
@@ -99,7 +109,11 @@ def plot_fabric_sections(original_length, remaining_length, removed_sections, wi
         y_offset -= 1
 
     
-
+    #saving the plots with the date and time.
+    from datetime import datetime
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    image_filename = f'fabric_sections_{timestamp}.png'
+    plt.savefig(image_filename,dpi=300)
     
     ax.set_xlim(0, original_length)
     ax.set_ylim(y_offset - 1, 3)
@@ -107,11 +121,6 @@ def plot_fabric_sections(original_length, remaining_length, removed_sections, wi
     ax.set_yticks([])
     ax.legend(loc='upper right')
     plt.title('Fabric Sections Visualization', fontsize=16)
-        #saving the plots with the date and time.
-    from datetime import datetime
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    image_filename = f'fabric_sections_{timestamp}.png'
-    plt.savefig(image_filename,dpi=300)
     plt.show()
 
 # Function to plot PPMS and lengths
@@ -147,19 +156,18 @@ def main(defects, length, width, threshold_ppms, num_sections):
     print(f"Original Length: {length} meters")
     
     if original_ppms > threshold_ppms:
-        sections = find_combined_highest_density_sections(defects, width, num_sections)
-        new_defects, new_length, total_cut_length, removed_sections = remove_sections(defects, length, width, sections)
+        combined_sections = find_combined_highest_density_sections(defects, width, num_sections)
+        new_defects, new_length, total_cut_length, removed_sections = remove_sections(defects, length, width, combined_sections)
         new_ppms = calculate_ppms(new_defects, new_length, width)
         
-        print(f"New PPMS after removing sections {sections}: {new_ppms}")
-        print(f"Total Length of cut parts: {total_cut_length+1} meters")
+        print(f"New PPMS after removing sections {combined_sections}: {new_ppms}")
+        print(f"Total Length of cut parts: {total_cut_length} meters")
         print(f"Remaining Length: {new_length} meters")
         
         plot_ppms(original_ppms, new_ppms, length, new_length, total_cut_length)
         plot_fabric_sections(length, new_length, removed_sections, width)
     else:
         print("PPMS is within acceptable limits. No need to cut the fabric.")
-
 # defects = [
 #     {"from": 2, "to": 2, "points": 4},
 #     {"from": 5, "to": 5, "points": 4},
@@ -174,8 +182,8 @@ def main(defects, length, width, threshold_ppms, num_sections):
 # ]
 
 defects = [
+    {"from": 5, "to": 5, "points": 4},
     {"from": 7, "to": 7, "points": 1},
-    # {"from": 5, "to": 5, "points": 4},
     {"from": 15, "to": 15, "points": 1},
     {"from": 15.3, "to": 18.5, "points": 25},
     {"from": 23, "to": 23, "points": 4},
@@ -197,7 +205,7 @@ defects = [
 length = 103  # Example length in meters
 width = 1.5     # Example width in meters
 THRESHOLD_PPMS = 23  # Threshold PPMS
-NUM_SECTIONS = 3 # Number of sections to remove
+NUM_SECTIONS = 2 # Number of sections to remove
 
 main(defects, length, width, THRESHOLD_PPMS, NUM_SECTIONS)
 

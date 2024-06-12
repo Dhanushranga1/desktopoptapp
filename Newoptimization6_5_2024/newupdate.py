@@ -61,12 +61,12 @@ def remove_sections(defects, length, width, sections):
     # Check if the remaining parts are less than 20 meters
     remaining_starts = [0] + [end + 1 for start, end in sections]
     remaining_ends = [start - 1 for start, end in sections] + [length - 1]
-    remaining_sections = [(start, end) for start, end in zip(remaining_starts, remaining_ends) if end - start + 1 >= 5]
+    remaining_sections = [(start, end) for start, end in zip(remaining_starts, remaining_ends) if end - start + 1 >= 20]
 
     if remaining_sections:
         new_defects = [d for d in new_defects if any(start <= d['from'] <= end for start, end in remaining_sections)]
         new_length = sum(end - start + 1 for start, end in remaining_sections)
-        removed_sections.extend([(start, end) for start, end in zip(remaining_starts, remaining_ends) if end - start + 1 < 5])
+        removed_sections.extend([(start, end) for start, end in zip(remaining_starts, remaining_ends) if end - start + 1 < 20])
     
     return new_defects, new_length, total_cut_length, removed_sections
 
@@ -99,7 +99,11 @@ def plot_fabric_sections(original_length, remaining_length, removed_sections, wi
         y_offset -= 1
 
     
-
+    #saving the plots with the date and time.
+    from datetime import datetime
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    image_filename = f'fabric_sections_{timestamp}.png'
+    plt.savefig(image_filename,dpi=300)
     
     ax.set_xlim(0, original_length)
     ax.set_ylim(y_offset - 1, 3)
@@ -107,11 +111,6 @@ def plot_fabric_sections(original_length, remaining_length, removed_sections, wi
     ax.set_yticks([])
     ax.legend(loc='upper right')
     plt.title('Fabric Sections Visualization', fontsize=16)
-        #saving the plots with the date and time.
-    from datetime import datetime
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    image_filename = f'fabric_sections_{timestamp}.png'
-    plt.savefig(image_filename,dpi=300)
     plt.show()
 
 # Function to plot PPMS and lengths
@@ -177,8 +176,8 @@ defects = [
     {"from": 7, "to": 7, "points": 1},
     # {"from": 5, "to": 5, "points": 4},
     {"from": 15, "to": 15, "points": 1},
-    {"from": 15.3, "to": 18.5, "points": 25},
-    {"from": 23, "to": 23, "points": 4},
+    {"from": 15.3, "to": 18.5, "points": 12},
+    {"from": 23, "to": 23, "points": 5},
     {"from": 25, "to": 25, "points": 1},
     {"from": 28, "to": 28, "points": 4},
     {"from": 30, "to": 30, "points": 1},
@@ -197,7 +196,7 @@ defects = [
 length = 103  # Example length in meters
 width = 1.5     # Example width in meters
 THRESHOLD_PPMS = 23  # Threshold PPMS
-NUM_SECTIONS = 3 # Number of sections to remove
+NUM_SECTIONS = 2 # Number of sections to remove
 
 main(defects, length, width, THRESHOLD_PPMS, NUM_SECTIONS)
 

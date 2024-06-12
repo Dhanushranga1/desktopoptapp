@@ -73,8 +73,12 @@ def remove_sections(defects, length, width, sections):
     
     return new_defects, new_length, total_cut_length, removed_sections, remaining_sections
 
+
+
+
 # Function to plot the original, remaining, and removed fabric sections
-def plot_fabric_sections(canvas_frame, original_length, remaining_length, removed_sections, remaining_sections, width):
+# Function to plot the original, remaining, and removed fabric sections
+def plot_fabric_sections(canvas_frame, origisnal_length, remaining_length, removed_sections, remaining_sections, width):
     fig, ax = plt.subplots(figsize=(14, 8))
     
     sns.set(style="whitegrid")
@@ -101,14 +105,27 @@ def plot_fabric_sections(canvas_frame, original_length, remaining_length, remove
     ax.set_yticks([])
     ax.legend(loc='upper right')
     plt.title('Fabric Sections Visualization', fontsize=16)
+    if canvas_frame is not None:
+        plt.savefig('fabric_sections.png',dpi=300)
+        # Display the plot in the tkinter canvas
+        for widget in canvas_frame.winfo_children():
+            widget.destroy()
 
-    # Display the plot in the tkinter canvas
-    for widget in canvas_frame.winfo_children():
-        widget.destroy()
+        canvas = FigureCanvasTkAgg(fig, master=canvas_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+    else:
+        plt.savefig('fabric_sections.png',dpi=300)
+        plt.show()
 
-    canvas = FigureCanvasTkAgg(fig, master=canvas_frame)
-    canvas.draw()
-    canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+    # # Display the plot in the tkinter canvas
+    # for widget in canvas_frame.winfo_children():
+    #     widget.destroy()
+
+    # canvas = FigureCanvasTkAgg(fig, master=canvas_frame)
+    # canvas.draw()
+    # canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
 
 # Function to plot PPMS and lengths
 def plot_ppms(canvas_frame, before_ppms, after_ppms, original_length, new_length, cut_length):
@@ -233,6 +250,7 @@ class FabricOptimizerApp(tk.Tk):
         
         self.result_text.delete("1.0", tk.END)
         main(self.defects, length, width, threshold_ppms, num_sections, self.canvas_frame1, self.canvas_frame2, self.result_text, self.info_frame)
+    
 
 if __name__ == "__main__":
     app = FabricOptimizerApp()
