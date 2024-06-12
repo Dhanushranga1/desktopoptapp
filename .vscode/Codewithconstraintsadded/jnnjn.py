@@ -71,11 +71,10 @@ def remove_sections(defects, length, width, sections, min_usable_length, include
         removed_sections.extend([(start, end) for start, end in zip(remaining_starts, remaining_ends) if end - start + 1 < min_usable_length])
     
     # Check for usable fabric in removed sections
-
-    depth=7
+    depth = 3
     for start, end in removed_sections:
-        if end - start + 1 > depth:
-            usable_sections = [(s, e) for s, e in zip(range(int(start), int(end) + 1, depth), range(int(start) + depth - 1, int(end) + 1, depth))]
+        if end - start + 1 > int(depth):
+            usable_sections = [(s, e) for s, e in zip(range(int(start), int(end) + 1, int(depth)), range(int(start) + int(depth) - 1, int(end) + 1, int(depth)))]
             for s, e in usable_sections:
                 section_ppms = calculate_section_ppms(defects, s, e, width)
                 if section_ppms <= THRESHOLD_PPMS and (e - s + 1) >= min_usable_length:
@@ -179,7 +178,7 @@ defects = [
     {"from": 7, "to": 7, "points": 1},
     # {"from": 5, "to": 5, "points": 4},
     {"from": 15, "to": 15, "points": 1},
-    {"from": 15.3, "to": 18.5, "points": 25},
+    {"from": 15.3, "to": 18.5, "points": 30},
     {"from": 23, "to": 23, "points": 4},
     {"from": 25, "to": 25, "points": 1},
     {"from": 28, "to": 28, "points": 4},
@@ -197,8 +196,8 @@ defects = [
 length = 103  # Example length in meters
 width = 1.5     # Example width in meters
 THRESHOLD_PPMS = 23  # Threshold PPMS
-NUM_SECTIONS = 4  # Number of sections to remove
-MIN_USABLE_LENGTH = 7   # Minimum usable length in meters
+NUM_SECTIONS = 5  # Number of sections to remove
+MIN_USABLE_LENGTH = 2   # Minimum usable length in meters
 MAX_GAP = 5  # Maximum gap between sections to be considered for combining
 
 main(defects, length, width, THRESHOLD_PPMS, NUM_SECTIONS, MIN_USABLE_LENGTH, MAX_GAP)
