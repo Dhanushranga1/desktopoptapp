@@ -3,7 +3,7 @@ import pyodbc
 
 # Create a connection to the SQLite database
 conn = pyodbc.connect(r'DRIVER={SQL Server};'
-                      r'SERVER=DHANUSH\\SQLEXPRESS;'
+                      r'SERVER=Dhanush\SQLEXPRESS;'
                       r'DATABASE=DB1;'
                       r'Trusted_Connection=yes;')
 cursor = conn.cursor()
