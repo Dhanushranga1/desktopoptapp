@@ -72,8 +72,8 @@ def remove_sections(defects, length, width, sections, min_usable_length, include
     
     # Check for usable fabric in removed sections
     for start, end in removed_sections:
-        if end - start + 1 > int(depth):
-            usable_sections = [(s, e) for s, e in zip(range(int(start), int(end) + 1, int(depth)), range(int(start) + int(depth) - 1, int(end) + 1, int(depth)))]
+        if end - start + 1 > 10:
+            usable_sections = [(s, s + 9) for s in range(start, end + 1, 10)]
             for s, e in usable_sections:
                 section_ppms = calculate_section_ppms(defects, s, e, width)
                 if section_ppms <= THRESHOLD_PPMS and (e - s + 1) >= min_usable_length:
@@ -82,7 +82,7 @@ def remove_sections(defects, length, width, sections, min_usable_length, include
                     total_cut_length -= (e - s + 1)
     
     # Remove end section with high defects (76m to 79m)
-    new_defects = [d for d in new_defects if d['from'] >= 79 or d['to'] <= 76]
+    new_defects = [d for d in new_defects if d['from'] > 79 or d['to'] < 76]
     removed_sections.append((76, 79))
     total_cut_length += 4
     new_length -= 4
@@ -149,16 +149,15 @@ def plot_ppms(before_ppms, after_ppms, original_length, new_length, cut_length):
     fig.tight_layout()
     plt.show()
 
-
 # Main function
-def main(defects, length, width, threshold_ppms, num_sections, min_usable_length, max_gap):
+def main(defects, length, width, threshold_ppms, num_sections, min_usable_length, max_gap, include_point_loss):
     original_ppms = calculate_ppms(defects, length, width)
     print(f"Original PPMS: {original_ppms}")
     print(f"Original Length: {length} meters")
     
     if original_ppms > threshold_ppms:
         sections = find_combined_highest_density_sections(defects, width, num_sections, max_gap)
-        new_defects, new_length, total_cut_length, removed_sections, kept_sections = remove_sections(defects, length, width, sections, min_usable_length, include_point_loss=False)
+        new_defects, new_length, total_cut_length, removed_sections, kept_sections = remove_sections(defects, length, width, sections, min_usable_length, include_point_loss)
         new_ppms = calculate_ppms(new_defects, new_length, width)
         
         print(f"New PPMS after removing sections {sections}: {new_ppms}")
@@ -166,18 +165,15 @@ def main(defects, length, width, threshold_ppms, num_sections, min_usable_length
         print(f"Remaining Length: {new_length} meters")
         
         plot_ppms(original_ppms, new_ppms, length, new_length, total_cut_length)
-        # plot_fabric_sections(length, new_length, removed_sections, width)
-        plot_fabric_sections(original_length=length, remaining_length=new_length, removed_sections=removed_sections, kept_sections=kept_sections, width=width)
-
+        plot_fabric_sections(length, new_length, removed_sections, kept_sections, width)
     else:
         print("PPMS is within acceptable limits. No need to cut the fabric.")
 
 # Example usage
 defects = [
     {"from": 7, "to": 7, "points": 1},
-    # {"from": 5, "to": 5, "points": 4},
     {"from": 15, "to": 15, "points": 1},
-    {"from": 15.3, "to": 18.5, "points": 30},
+    {"from": 15.3, "to": 18.5, "points": 25},
     {"from": 23, "to": 23, "points": 4},
     {"from": 25, "to": 25, "points": 1},
     {"from": 28, "to": 28, "points": 4},
@@ -193,12 +189,11 @@ defects = [
 ]
 
 length = 103  # Example length in meters
-width = 1.5     # Example width in meters
+width = 1.5  # Example width in meters
 THRESHOLD_PPMS = 23  # Threshold PPMS
 NUM_SECTIONS = 5  # Number of sections to remove
-MIN_USABLE_LENGTH = 2   # Minimum usable length in meters
-MAX_GAP = 5  # Maximum gap between sections to be considered for combining
-depth = 17
+MIN_USABLE_LENGTH = 0  # Minimum usable length in meters
+MAX_GAP = 4  # Maximum gap between sections to be considered for combining
+INCLUDE_POINT_LOSS = True  # Include 4-point loss when joining sections
 
-
-main(defects, length, width, THRESHOLD_PPMS, NUM_SECTIONS, MIN_USABLE_LENGTH, MAX_GAP)
+main(defects, length, width, THRESHOLD_PPMS, NUM_SECTIONS, MIN_USABLE_LENGTH, MAX_GAP, INCLUDE_POINT_LOSS)
